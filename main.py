@@ -5,6 +5,7 @@ import json
 import os
 from dotenv import load_dotenv, dotenv_values 
 import requests
+import time
 
 #Authentification 
 
@@ -25,7 +26,6 @@ proxy = f'http://{ENV_PROXY_USERNAME}:{ENV_PROXY_PASSWORD}@{ENV_PROXY_ADRESS}:{E
 
 cl = Client()
 
-
 try:
     cl.load_settings("session.json")
     cl.login(ENV_IG_USERNAME,ENV_IG_PASSWORD)
@@ -40,13 +40,18 @@ except FileNotFoundError:
         json.dump(settings,f)
 
 
-#Get user 
-user = cl.user_info_by_username("french.mush")
+def get_medias(user):
+    #Get user 
+    user = cl.user_info_by_username(user)
 
-#Get medias from user
-medias = cl.user_medias(user.pk,amount=3)
-rows = [media.model_dump(mode = "json") for media in medias]
-df = pd.DataFrame(rows)
+    #Get medias from user and stores it into a dataFrame
+    time.sleep(2)
+    medias = cl.user_medias(user.pk,amount=3)
+    rows = [media.model_dump(mode = "json") for media in medias]
+    df = pd.DataFrame(rows)
+    print(df.columns)
 
-print(df.columns)
+get_medias("french.mush")
+
+
 
