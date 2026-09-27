@@ -45,6 +45,8 @@ user = cl.user_info_by_username("french.mush")
 
 #Get medias from user
 medias = cl.user_medias(user.pk,amount=3)
+rows = [media.model_dump(mode = "json") for media in medias]
+df = pd.DataFrame(rows)
 
-print(medias[0])
+print(df.columns)
 
