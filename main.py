@@ -38,7 +38,13 @@ except FileNotFoundError:
 
     with open("session.json","w") as f:
         json.dump(settings,f)
-    
-except: 
 
+
+#Get user 
+user = cl.user_info_by_username("french.mush")
+
+#Get medias from user
+medias = cl.user_medias(user.pk,amount=3)
+
+print(medias[0])
 
