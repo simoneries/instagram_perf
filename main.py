@@ -46,12 +46,23 @@ def get_medias(user):
 
     #Get medias from user and stores it into a dataFrame
     time.sleep(2)
-    medias = cl.user_medias(user.pk,amount=3)
+    medias = cl.user_medias(user.pk,amount=10)
     rows = [media.model_dump(mode = "json") for media in medias]
-    df = pd.DataFrame(rows)
-    print(df.columns)
+    df = pd.json_normalize(rows,sep="_") 
 
-get_medias("french.mush")
+    #crée une colonne de coauteurs
+    df["coauthors"] = df["coauthor_producers"].apply(lambda liste: [d['username'] for d in liste])
+    df["coauthors_pk"] = df["coauthor_producers"].apply(lambda liste: [d['pk'] for d in liste])
+
+    #crée une colonne de sponsors
+    df["sponsors"] = df["sponsor_tags"].apply(lambda liste: [d['username'] for d in liste])
+    df["sponsors_pk"] = df["sponsor_tags"].apply(lambda liste: [d['pk'] for d in liste])
+
+    return df
+
+df = get_medias("french.mush")
+
+df.to_csv("test.csv")
 
 
 
