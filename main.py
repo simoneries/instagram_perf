@@ -12,6 +12,8 @@ import datetime
 
 load_dotenv()
 
+PROJECT_ID = 'performance-analyzer-1309'
+
 #Get secrets
 def get_secret(name):
     if name in os.environ:
@@ -20,10 +22,8 @@ def get_secret(name):
     from google.cloud import secretmanager
 
     client = secretmanager.SecretManagerServiceClient()
-    path = f"projects/{os.environ['performance-analyzer-1309']}/secrets/{name}/versions/latest"
+    path = f"projects/{PROJECT_ID}/secrets/{name}/versions/latest"
     return client.access_secret_version(name=path).payload.data.decode('UTF-8')
-
-
 
 
 ENV_PROXY_ADRESS = get_secret("PROXY_ADRESS")
