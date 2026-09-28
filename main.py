@@ -60,7 +60,17 @@ def get_medias(user):
 
     return df
 
-df = get_medias("french.mush")
+def merge_df(accounts):
+    df = pd.DataFrame()
+    for acc in accounts:
+        df_iter = get_medias(acc)
+        df = pd.concat([df,df_iter],axis=0)
+    df = df.reset_index()
+    return df
+
+lst = ["french.mush","french.mush.it"]
+
+df = merge_df(lst)
 
 df.to_csv("test.csv")
 
