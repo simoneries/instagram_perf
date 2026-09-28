@@ -10,15 +10,29 @@ import datetime
 
 #Authentification 
 
-#Get .env variables
 load_dotenv()
-ENV_PROXY_ADRESS = os.getenv("PROXY_ADRESS")
-ENV_PROXY_PORT = os.getenv("PROXY_PORT")
-ENV_PROXY_USERNAME = os.getenv("PROXY_USERNAME")
-ENV_PROXY_PASSWORD = os.getenv("PROXY_PASSWORD")
 
-ENV_IG_USERNAME = os.getenv("IG_USERNAME")
-ENV_IG_PASSWORD = os.getenv("IG_PASSWORD")
+#Get secrets
+def get_secret(name):
+    if name in os.environ:
+        return os.environ[name]
+
+    from google.cloud import secretmanager
+
+    client = secretmanager.SecretManagerServiceClient()
+    path = f"projects/{os.environ['performance-analyzer-1309']}/secrets/{name}/versions/latest"
+    return client.access_secret_version(name=path).payload.data.decode('UTF-8')
+
+
+
+
+ENV_PROXY_ADRESS = get_secret("PROXY_ADRESS")
+ENV_PROXY_PORT = get_secret("PROXY_PORT")
+ENV_PROXY_USERNAME = get_secret("PROXY_USERNAME")
+ENV_PROXY_PASSWORD = get_secret("PROXY_PASSWORD")
+
+ENV_IG_USERNAME = get_secret("IG_USERNAME")
+ENV_IG_PASSWORD = get_secret("IG_PASSWORD")
 
 
 #Define the proxy adress
