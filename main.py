@@ -69,13 +69,11 @@ def get_medias(user):
 
 def merge_df(accounts):
     df = pd.DataFrame()
-    for acc in accounts:
-        df_iter = get_medias(acc)
-        df = pd.concat([df,df_iter],axis=0)
-    df = df.reset_index()
-    return df
+    frames = [get_medias(acc) for acc in accounts]
+    df = pd.concat(frames,axis=0,ignore_index=True)
+    return df.copy()
 
-lst = ["french.mush","french.mush.it","bonjourdrink","bulk","miumlab_fr"]
+lst = ["french.mush","french.mush.it","bonjourdrink","bulk","miumlab_fr","nutrimea_fr","foursigmatic","ryzesuperfoods"]
 
 df = merge_df(lst)
 
