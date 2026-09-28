@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv, dotenv_values 
 import requests
 import time
+import datetime
 
 #Authentification 
 
@@ -58,6 +59,12 @@ def get_medias(user):
     df["sponsors"] = df["sponsor_tags"].apply(lambda liste: [d['username'] for d in liste])
     df["sponsors_pk"] = df["sponsor_tags"].apply(lambda liste: [d['pk'] for d in liste])
 
+    #crée une colonne pour marquer la date de collecte
+    time_now = datetime.datetime.now()
+    df["scraping_time"] = time_now
+
+
+
     return df
 
 def merge_df(accounts):
@@ -68,7 +75,7 @@ def merge_df(accounts):
     df = df.reset_index()
     return df
 
-lst = ["french.mush","french.mush.it"]
+lst = ["french.mush","french.mush.it","bonjourdrink","bulk","miumlab_fr"]
 
 df = merge_df(lst)
 
