@@ -92,7 +92,7 @@ def merge_df(accounts):
     df = pd.concat(frames, axis=0, ignore_index=True)
     return df.copy()
 
-lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr",]
+lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr","bulk"]
 
 
 df = merge_df(lst)
