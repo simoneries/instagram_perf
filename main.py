@@ -7,6 +7,7 @@ from dotenv import load_dotenv, dotenv_values
 import requests
 import time
 import datetime
+from google.cloud import storage
 
 #Authentification 
 
@@ -89,9 +90,25 @@ def merge_df(accounts):
 
 lst = ["french.mush","french.mush.it","bonjourdrink","bulk","miumlab_fr","nutrimea_fr","foursigmatic","ryzesuperfoods"]
 
+
 df = merge_df(lst)
 
-df.to_csv("test.csv")
+def upload_parquet_togcloud(df,filename,project,bucket):
+    #convert the df to parquet
+    parquet_file = df.to_parquet(index=False)
+
+    #Initialize GCS client
+    client = storage.Client(project=project)
+    bucket = client.bucket(bucket)
+    bucket.blob(filename).upload_from_string(parquet_file,content_type="application/octet-stream")
+
+
+today_date = datetime.date.today().isoformat()
+
+filename = f"dataset/date={today_date}/data.parquet"
+
+upload_parquet_togcloud(df,filename,"performance-analyzer-1309"," insta-perf-analyzer-bucket")
+
 
 
 
