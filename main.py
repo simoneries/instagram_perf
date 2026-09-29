@@ -8,6 +8,7 @@ import requests
 import time
 import datetime
 from google.cloud import storage
+import random
 
 #Authentification 
 
@@ -59,10 +60,10 @@ except FileNotFoundError:
 
 def get_medias(user):
     #Get user 
-    user = cl.user_info_by_username(user)
+    user = cl.user_info_by_username_v1(user)
 
     #Get medias from user and stores it into a dataFrame
-    time.sleep(2)
+    time.sleep(random.uniform(5,15))
     medias = cl.user_medias(user.pk,amount=10)
     rows = [media.model_dump(mode = "json") for media in medias]
     df = pd.json_normalize(rows,sep="_") 
