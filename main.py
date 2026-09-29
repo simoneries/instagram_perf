@@ -44,6 +44,7 @@ cl = Client()
 
 try:
     cl.load_settings("session.json")
+    cl.set_proxy(proxy)
     cl.login(ENV_IG_USERNAME,ENV_IG_PASSWORD)
 
 except FileNotFoundError:
