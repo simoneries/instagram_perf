@@ -64,7 +64,7 @@ def get_medias(user):
 
     #Get medias from user and stores it into a dataFrame
     time.sleep(random.uniform(5,15))
-    medias = cl.user_medias_v1(user.pk,amount=10)
+    medias = cl.user_medias_v1(user.pk,amount=0)
     rows = [media.model_dump(mode = "json") for media in medias]
     df = pd.json_normalize(rows,sep="_") 
 
@@ -88,7 +88,7 @@ def merge_df(accounts):
     frames = []
     for acc in accounts:
         frames.append(get_medias(acc))
-        time.sleep(random.uniform(8, 20))
+        time.sleep(random.uniform(60, 90))
     df = pd.concat(frames, axis=0, ignore_index=True)
     return df.copy()
 
