@@ -107,7 +107,7 @@ today_date = datetime.date.today().isoformat()
 
 filename = f"dataset/date={today_date}/data.parquet"
 
-upload_parquet_togcloud(df,filename,"performance-analyzer-1309"," insta-perf-analyzer-bucket")
+upload_parquet_togcloud(df,filename,"performance-analyzer-1309","insta-perf-analyzer-bucket")
 
 
 
