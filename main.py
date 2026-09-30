@@ -63,7 +63,7 @@ def get_medias(user):
     user = cl.user_info_by_username_v1(user)
 
     #Get medias from user and stores it into a dataFrame
-    time.sleep(random.uniform(5,15))
+    time.sleep(random.uniform(1,5))
     medias = cl.user_medias_v1(user.pk,amount=0)
     rows = [media.model_dump(mode = "json") for media in medias]
     df = pd.json_normalize(rows,sep="_") 
@@ -84,18 +84,18 @@ def get_medias(user):
 
     return df
 
-def merge_df(accounts):
+def get_and_merge_df(accounts):
     frames = []
     for acc in accounts:
         frames.append(get_medias(acc))
-        time.sleep(random.uniform(60, 90))
+        time.sleep(random.uniform(1, 3))
     df = pd.concat(frames, axis=0, ignore_index=True)
     return df.copy()
 
-lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr","bulk"]
+lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr"]
 
 
-df = merge_df(lst)
+df = get_and_merge_dfmerge_df(lst)
 
 def upload_parquet_togcloud(df,filename,project,bucket):
     #convert the df to parquet
