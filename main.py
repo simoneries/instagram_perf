@@ -70,7 +70,7 @@ pk_cache = load_pk_cache()
 def get_pk(username):
     """Retourne le pk d'un compte. N'appelle Instagram qu'à la première fois."""
     if username not in pk_cache:
-        time.sleep(random.uniform(5, 15))
+        time.sleep(random.uniform(1, 3))
         pk_cache[username] = cl.user_info_by_username_v1(username).pk
         with open(PK_CACHE_FILE, "w") as f:
             json.dump(pk_cache, f, indent=2)
@@ -78,14 +78,11 @@ def get_pk(username):
 
 
 def get_medias(user):
-    #Get user 
-    user = cl.user_info_by_username_v1(user)
-
-    #Get medias from user and stores it into a dataFrame
-    time.sleep(random.uniform(1,5))
-    medias = cl.user_medias_v1(user.pk,amount=0)
-    rows = [media.model_dump(mode = "json") for media in medias]
-    df = pd.json_normalize(rows,sep="_") 
+    # Récupère les médias (le pk vient du cache)
+    time.sleep(random.uniform(1, 3))
+    medias = cl.user_medias_v1(get_pk(user), amount=10)
+    rows = [media.model_dump(mode="json") for media in medias]
+    df = pd.json_normalize(rows, sep="_")
 
     #crée une colonne de coauteurs
     df["coauthors"] = df["coauthor_producers"].apply(lambda liste: [d['username'] for d in liste])
@@ -114,7 +111,7 @@ def get_and_merge_df(accounts):
 lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr"]
 
 
-df = get_and_merge_dfmerge_df(lst)
+df = get_and_merge_df(lst)
 
 def upload_parquet_togcloud(df,filename,project,bucket):
     #convert the df to parquet
