@@ -57,6 +57,25 @@ except FileNotFoundError:
     with open("session.json","w") as f:
         json.dump(settings,f)
 
+PK_CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pk_cache.json")
+
+def load_pk_cache():
+    if os.path.exists(PK_CACHE_FILE):
+        with open(PK_CACHE_FILE) as f:
+            return json.load(f)
+    return {}
+
+pk_cache = load_pk_cache()
+
+def get_pk(username):
+    """Retourne le pk d'un compte. N'appelle Instagram qu'à la première fois."""
+    if username not in pk_cache:
+        time.sleep(random.uniform(5, 15))
+        pk_cache[username] = cl.user_info_by_username_v1(username).pk
+        with open(PK_CACHE_FILE, "w") as f:
+            json.dump(pk_cache, f, indent=2)
+    return pk_cache[username]
+
 
 def get_medias(user):
     #Get user 
