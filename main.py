@@ -76,6 +76,12 @@ def get_pk(username):
             json.dump(pk_cache, f, indent=2)
     return pk_cache[username]
 
+def extract(df, col, key):
+    if col not in df.columns:
+        return pd.Series([[] for _ in range(len(df))], index=df.index)
+    return df[col].apply(
+        lambda l: [d[key] for d in l] if isinstance(l, list) else []
+    )
 
 def get_medias(user):
     # Récupère les médias (le pk vient du cache)
@@ -85,12 +91,10 @@ def get_medias(user):
     df = pd.json_normalize(rows, sep="_")
 
     #crée une colonne de coauteurs
-    df["coauthors"] = df["coauthor_producers"].apply(lambda liste: [d['username'] for d in liste])
-    df["coauthors_pk"] = df["coauthor_producers"].apply(lambda liste: [d['pk'] for d in liste])
-
-    #crée une colonne de sponsors
-    df["sponsors"] = df["sponsor_tags"].apply(lambda liste: [d['username'] for d in liste])
-    df["sponsors_pk"] = df["sponsor_tags"].apply(lambda liste: [d['pk'] for d in liste])
+    df["coauthors"]    = extract(df, "coauthor_producers", "username")
+    df["coauthors_pk"] = extract(df, "coauthor_producers", "pk")
+    df["sponsors"]     = extract(df, "sponsor_tags", "username")
+    df["sponsors_pk"]  = extract(df, "sponsor_tags", "pk")
 
     #crée une colonne pour marquer la date de collecte
     time_now = datetime.datetime.now()
@@ -118,7 +122,7 @@ cols = ["user_pk","user_username","user_stories","scraping_time","pk","id","vide
 df = get_and_merge_df(lst)
 
 #filtrer sur les bonnes colonnes
-df = df[cols].copy()
+df = df.reindex(columns=cols).copy()
 
 #fixer les types 
 def clean_df(df):
@@ -150,7 +154,7 @@ def clean_df(df):
         ).astype("string")
 
     #clean json ans pass it to string
-    for c in ["crosspost", "user_stories"]:
+    for c in ["crosspost", "user_stories","usertags"]:
         df[c] = df[c].map(
             lambda v: json.dumps(v, ensure_ascii=False, default=str)
             if isinstance(v, (dict, list)) else None
