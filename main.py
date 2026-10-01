@@ -110,8 +110,54 @@ def get_and_merge_df(accounts):
 
 lst = ["french.mush","french.mush.it","bonjourdrink","miumlab_fr"]
 
+cols = ["user_pk","user_username","user_stories","scraping_time","pk","id","video_url","video_duration",
+"location_lat","location_lng","crosspost","coauthors","coauthors_pk","sponsors",
+"sponsors_pk","taken_at","media_type","caption_text","is_paid_partnership",
+"is_affiliate","usertags","like_count","comment_count","view_count","play_count"]
 
 df = get_and_merge_df(lst)
+
+#filtrer sur les bonnes colonnes
+df = df[cols].copy()
+
+#fixer les types 
+def clean_df(df):
+    #clean strings
+    for c in ["user_pk", "pk", "id", "user_username", "video_url", "caption_text"]:
+        df[c]=df[c].astype("string")
+
+    #clean integers
+    for c in ["media_type", "like_count", "comment_count", "view_count", "play_count"]:
+        df[c]=pd.to_numeric(df[c], errors="coerce").astype("Int64")
+
+    # clean booleans
+    for c in ["is_paid_partnership", "is_affiliate"]:
+        df[c] = df[c].astype("boolean")
+
+    # clean dates
+    for c in ["taken_at", "scraping_time"]:
+        df[c] = pd.to_datetime(df[c], utc=True)
+
+    # clean floats
+    for c in ["video_duration", "location_lat", "location_lng"]:
+        df[c] = pd.to_numeric(df[c], errors="coerce").astype("float64")
+
+    # clean lists
+    for c in ["coauthors", "coauthors_pk", "sponsors", "sponsors_pk"]:
+        df[c] = df[c].map(
+            lambda v: ",".join(str(x) for x in v)
+            if isinstance(v, (list, tuple)) else None
+        ).astype("string")
+
+    #clean json ans pass it to string
+    for c in ["crosspost", "user_stories"]:
+        df[c] = df[c].map(
+            lambda v: json.dumps(v, ensure_ascii=False, default=str)
+            if isinstance(v, (dict, list)) else None
+        ).astype("string")
+
+    return df
+
 
 def upload_parquet_togcloud(df,filename,project,bucket):
     #convert the df to parquet
@@ -127,7 +173,7 @@ today_date = datetime.date.today().isoformat()
 
 filename = f"dataset/date={today_date}/data.parquet"
 
-upload_parquet_togcloud(df,filename,"performance-analyzer-1309","insta-perf-analyzer-bucket")
+upload_parquet_togcloud(clean_df(df),filename,"performance-analyzer-1309","insta-perf-analyzer-bucket")
 
 
 
